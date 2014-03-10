@@ -1,6 +1,6 @@
 ###############################################################################
 ###############################################################################
-##izabot 0.4.0                                                                #
+##izabot 0.5.0                                                                #
 ###############################################################################
 ###############################################################################
 ##creato da: izabera                                                          #
@@ -12,9 +12,11 @@
 ##vietato rimuovere questo riquadro                                           #
 ###############################################################################
 ##TODO:                                                                       #
-##sistemare lo stile, le split tagliano via roba                              #
-##comandi di avvio                                                            #
-##                                                                            #
+##funzioni da correggere                                                      #
+##lettura da file                                                             #
+##aggiornamento da file possibile?                                            #
+##prendere il chan in un altro modo                                           #
+##perche' stampa doppio?                                                      #
 ###############################################################################
 
 import socket
@@ -26,14 +28,22 @@ r = attivo = started = 0
 ##dati del bot                                                                #
 ###############################################################################
 
-from leggidati import *
+import leggidati
+owner = leggidati.owner
+nomebot = leggidati.nomebot
+password = leggidati.password
+rete = leggidati.rete
+port = leggidati.port
+comandi = leggidati.comandi
+comandibot = leggidati.comandibot
+trigger = leggidati.trigger
 
 ###############################################################################
 ##autenticazione                                                              #
 ###############################################################################
 
-nickserv = 1
-authserv = 0
+nickserv = 0
+authserv = 1
 altro = 0
 
 ###############################################################################
@@ -41,43 +51,44 @@ altro = 0
 ##interfaccia col protocollo                                                  #
 ###############################################################################
 
-def ircsend ( messaggio ): #azione base
+def ircsend ( messaggio ): #azione base #debug:perfetta
   irc.send ( messaggio+'\r\n' )
   print '<'+nomebot+'> '+messaggio.strip() #in questo modo si puo' stilizzare a piacere
 
-def ircnick ( nick ):
+def ircnick ( nick ): #debug:da testare
   ircsend ( 'NICK '+nick )
 
-def ircprivmsg ( destinatario, messaggio, action=None ) :
+def ircprivmsg ( destinatario, messaggio, action=None ) : #debug:perfetta
   #destinatario puo' essere un chan se preceduto da un cancelletto
   if action == None:
     ircsend ( 'PRIVMSG '+destinatario+' :'+messaggio )
   else :
     ircsend ( 'PRIVMSG '+destinatario+' :\001ACTION '+messaggio )
 
-def ircjoin ( chan ) : #il chan deve avere un asterisco davanti
+def ircjoin ( chan ) : #il chan deve avere un asterisco davanti #debug:perfetta
   ircsend ( 'JOIN '+chan)
 
-def ircpart ( chan, motivo=None ) :
+def ircpart ( chan, motivo=None ) : #debug:funziona senza arg, da testare con
   if motivo == None:
     ircsend ( 'PART '+chan )
   else :
-    ircsend ( 'PART '+chan+': '+motivo )
+    ircsend ( 'PART '+chan+' '+motivo )
 
-def ircquit ( motivo=None ) :
+def ircquit ( motivo=None ) : #debug:perfetta
   if motivo == None:
-    ircsend ( 'QUIT' )
+    ircsend ( 'QUIT :izabot by izabera' )
   else :
-    ircsend ( 'QUIT '+motivo )
+    ircsend ( 'QUIT :'+motivo )
+  raise SystemExit
 
-def ircnotice ( destinatario, messaggio ) :
+def ircnotice ( destinatario, messaggio ) : #debug:perfetta
   ircsend ( 'NOTICE '+destinatario+' :'+messaggio )
 
 ###############################################################################
 ##macro                                                                       #
 ###############################################################################
 
-def avvio ( ) :
+def avvio ( ) : #debug:perfetta
   global started;
   if started == 0:
     ircprivmsg ( owner, 'sono connesso' )
@@ -90,46 +101,57 @@ def avvio ( ) :
       ircsend ( 'JOIN #vhost')
     started = 1
 
-def autojoin ( ) :  #join se invitato
+def autojoin ( ) :  #join se invitato #debug:cambiare e mettere in gestione eventi
   channel=data.split('INVITE ')[1].split( )[1]
   ircjoin ( channel )
   ircprivmsg ( channel, 'ciao a tutti')
 
-def messaggio ( ) :
-  channel=data.split('PRIVMSG ')[-1].split(' :')[0]
-  if len(data.split(' :+messaggio '))>=2:
-    messaggio=data.split(' :+messaggio ')[1]
+def messaggio ( raw_arg=None ) :#debug:perfetta
+  if raw_arg!=None:
+    channel=raw_arg.split()[0]
+    try:
+      messaggio=raw_arg.split()[1:]
+      messaggio=' '.join(messaggio)
+    except:
+      messaggio=''
     ircprivmsg ( channel, messaggio )
 
-def query ( ) :
-  ricevitore=data.split(' :+query ')[1].split( )[0]
-  if len(data.split(' :+query '))>=2:
-    messaggio=data.split(' :+query ')[1].split(ricevitore+' ')[1]
+def query ( raw_arg=None ) :#debug:perfetta
+  if raw_arg!=None:
+    ricevitore=raw_arg.split()[0]
+    try:
+      messaggio=raw_arg.split()[1:]
+      messaggio=' '.join(messaggio)
+    except:
+      messaggio=''
     ircprivmsg ( ricevitore, messaggio )
 
-def notice ( ) :
-  ricevitore=data.split(' :+notice ')[1].split( )[0]
-  if len(data.split(' :+notice '))>=2:
-    messaggio=data.split(' :+notice ')[1].split(ricevitore+' ')[1]
+def notice ( raw_arg=None ) :#debug:perfetta
+  if raw_arg!=None:
+    ricevitore=raw_arg.split()[0]
+    try:
+      messaggio=raw_arg.split()[1:]
+      messaggio=' '.join(messaggio)
+    except:
+      messaggio=''
     ircnotice ( ricevitore, messaggio )
 
-def join ( ) :
-  if len(data.split(' :+join '))==2:
-    canale=data.split(' :+join ')[1].split( )[0]
-    ircjoin ( canale )
+def join ( raw_arg=None ) :#debug:perfetta
+  if raw_arg!=None:
+    ircjoin ( raw_arg )
 
-def part ( ) :
+def part ( raw_arg=None ) :#debug:funziona senza argomento, testare con
   channel=data.split('PRIVMSG ')[-1].split(' :')[0]
   nick=data.split('!')[0][1:]
   if (nick == owner):
-    ircpart ( channel )
+    if raw_arg==None:
+      ircpart ( channel )
+    else:
+      ircpart ( channel, raw_arg )
 
-def _quit ( ) :
+def _quit ( raw_arg=None ) :#debug:perfetta
   nick=data.split('!')[0][1:]
-  try:
-    motivo=data.split(' :+quit ')[1]
-  except:
-    motivo=None
+  motivo=raw_arg
   if (nick == owner):
     if motivo!=None:
       ircquit( motivo )
@@ -142,9 +164,11 @@ def _quit ( ) :
 
 def esegui (comando,parametri=None):
   if parametri==None:
-    print 'comando: '+comando
+    print 'comando: '+comando #debug
+    funzioni[comando]()
   else:
-    print 'comando: '+comando+', parametri: '+parametri
+    print 'comando: '+comando+', parametri: '+parametri #debug
+    funzioni[comando](parametri)
 
 def analisi (data): #sta cosa di sicuro si puo' fare con regex in tipo 2 righe
   riga=data.split("\n")
@@ -165,7 +189,7 @@ def analisi (data): #sta cosa di sicuro si puo' fare con regex in tipo 2 righe
       testo = riga[i][riga[i].index(parola[3]):]
     except:
       pass
-    if comando=='PRIVMSG': #il bot non gestisce altri eventi per ora
+    if comando=='PRIVMSG': #il bot non gestisce altri eventi per ora #debug:aggiungere gestione eventi
       if testo[0:2]==':'+trigger and testo[2:].split()[0] in comandibot:
         if testo.find(' ')!=-1:
           esegui (testo[2:].split()[0],testo[testo.index(' ')+1:].strip())
@@ -175,18 +199,18 @@ def analisi (data): #sta cosa di sicuro si puo' fare con regex in tipo 2 righe
 #    stampa = '<'+utente+'> _utente_ '+comando+' _comando_ '+destinatario+' _destinatario_ '+testo+' _testo_' #debug
     print stampa
   
-def bacio ( ) : #esempio di comando
+def bacio ( raw_arg ) : #esempio di comando #debug:da testare
   channel=data.split('PRIVMSG ')[-1].split(' :')[0]
   nick=data.split('!')[0][1:]
   if len(data.split(' :+bacio '))==2:
     ricevitore=data.split(' :+bacio ')[1].split( )[0]
     ircprivmsg ( channel, nick+' manda un dolce bacio :* a '+ricevitore)
 
-def deliranza ( ) : #esempio scemo di action
+def deliranza ( ) : #esempio scemo di action #debug:da testare
   channel=data.split('PRIVMSG ')[-1].split(' :')[0]
   ircprivmsg ( channel, 'balla meglio di johnny depp', 1)
 
-def game ( ) : #semplice gioco, funzione di avvio
+def game ( ) : #semplice gioco, funzione di avvio #debug:da testare
   global attivo
   global r
   r=random.randint(0,10000)
@@ -196,7 +220,7 @@ def game ( ) : #semplice gioco, funzione di avvio
     ircprivmsg ( channel, 'esempio: +g 10000')
     attivo=1
 
-def gameon ( ) : #semplice gioco, funzione di gioco
+def gameon ( ) : #semplice gioco, funzione di gioco #debug:da testare
   global attivo
   if attivo!=1 :
     channel=data.split('PRIVMSG ')[-1].split(' :')[0]
@@ -218,10 +242,12 @@ def gameon ( ) : #semplice gioco, funzione di gioco
     except ValueError:
       print 'errore'
 
-def ping ( ) :
+def ping ( ) : #debug:da testare
   channel=data.split('PRIVMSG ')[-1].split(' :')[0]
   nick=data.split('!')[0][1:]
   ircprivmsg ( channel, nick+': pong!')
+
+funzioni={'messaggio':messaggio,'query':query,'join':join,'part':part,'quit':_quit,'notice':notice,'delira':deliranza,'game':game,'bacio':bacio,'gameon':gameon,'ping':ping}
 
 ###############################################################################
 ##modulo di connessione                                                       #
@@ -237,30 +263,30 @@ while 1:
   analisi (data) 
   if data.find ( 'PING' ) != -1:
     ircsend ( 'PONG ' + data.split( ) [ 1 ] + '\r\n' )
-#  if data.find ( '---------- END OF MESSAGE(S) OF THE DAY ----------' ) != -1:
+  if data.find ( '---------- END OF MESSAGE(S) OF THE DAY ----------' ) != -1: #per ogn
     avvio ( )
-  if data.find('INVITE')!=-1:
-    autojoin ( )
-  if data.find(' :+bacio ')!=-1:
-    bacio ( )
-  if data.find(' :+messaggio ')!=-1:
-    messaggio ( )
-  if data.find(' :+query ')!=-1:
-    query ( )
-  if data.find(' :+notice ')!=-1:
-    notice ( )
-  if data.find(' :+join ')!=-1:
-    join ( )
-  if data.find(' :+part')!=-1:
-    part ( )
-  if data.find(' :+ping')!=-1:
-    ping ( )
-  if data.find(' :+game')!=-1:
-    game ( )
-  if data.find(' :+delira')!=-1:
-    deliranza ( )
-  if data.find(' :+g ')!=-1:
-    gameon ( )
-  if data.find(' :+quit')!=-1:
-    _quit ( )
-    break
+#  if data.find('INVITE')!=-1:
+#    autojoin ( )
+#  if data.find(' :+bacio ')!=-1:
+#    bacio ( )
+#  if data.find(' :+messaggio ')!=-1:
+#    messaggio ( )
+#  if data.find(' :+query ')!=-1:
+#    query ( )
+#  if data.find(' :+notice ')!=-1:
+#    notice ( )
+#  if data.find(' :+join ')!=-1:
+#    join ( )
+#  if data.find(' :+part')!=-1:
+#    part ( )
+#  if data.find(' :+ping')!=-1:
+#    ping ( )
+#  if data.find(' :+game')!=-1:
+#    game ( )
+#  if data.find(' :+delira')!=-1:
+#    deliranza ( )
+#  if data.find(' :+g ')!=-1:
+#    gameon ( )
+#  if data.find(' :+quit')!=-1:
+#    _quit ( )
+#    break
