@@ -26,14 +26,7 @@ r = attivo = started = 0
 ##dati del bot                                                                #
 ###############################################################################
 
-owner = 'izabera'
-nomebot = 'izabot'
-password = 'xxxx'
-rete = 'irc.freenode.net'
-port = 6667
-comandi = ['PRIVMSG','NOTICE','JOIN','INVITE','PART','QUIT','KICK']
-comandibot = ['join','part','quit','messaggio','query','notice','game','g','bacio','ping','delira',]
-trigger = '+'
+from leggidati import *
 
 ###############################################################################
 ##autenticazione                                                              #
@@ -50,13 +43,13 @@ altro = 0
 
 def ircsend ( messaggio ): #azione base
   irc.send ( messaggio+'\r\n' )
-  print '<'+nomebot+'> '+messaggio #in questo modo si puo' stilizzare a piacere
+  print '<'+nomebot+'> '+messaggio.strip() #in questo modo si puo' stilizzare a piacere
 
 def ircnick ( nick ):
   ircsend ( 'NICK '+nick )
 
 def ircprivmsg ( destinatario, messaggio, action=None ) :
-  #persona puo' essere un chan se preceduto da un cancelletto
+  #destinatario puo' essere un chan se preceduto da un cancelletto
   if action == None:
     ircsend ( 'PRIVMSG '+destinatario+' :'+messaggio )
   else :
