@@ -54,7 +54,7 @@ from adv_lib import *
 ##modulo di connessione                                                       #
 ###############################################################################
 
-from ircconnection import *
+from irc_con import *
 
 irc.connect ( ( rete, port ) )
 irc.recv ( 4096 )
@@ -63,7 +63,5 @@ ircsend ( 'USER '+nomebot+' '+nomebot+' '+nomebot+' :bot creato da iza in python
 while 1:
   data = irc.recv ( 4096 )
   analisi (data) 
-  if data.find ( 'PING' ) != -1:
-    ircsend ( 'PONG ' + data.split( ) [ 1 ] + '\r\n' )
 #  if data.find ( '---------- END OF MESSAGE(S) OF THE DAY ----------' ) != -1: #per ogn
-    avvio ( )
+  avvio ( )

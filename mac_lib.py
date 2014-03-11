@@ -7,7 +7,7 @@ def autojoin ( ) :  #join se invitato #debug:cambiare e mettere in gestione even
   ircjoin ( channel )
   ircprivmsg ( channel, 'ciao a tutti')
 
-def messaggio (utente,comando,destinatario,parametri) :
+def messaggio (utente,destinatario,parametri) :
   try:
     parametri=parametri.strip( )
     temp=parametri.split( )
@@ -18,26 +18,32 @@ def messaggio (utente,comando,destinatario,parametri) :
   except:
     pass
 
-def query (utente,comando,destinatario,parametri) :
-  messaggio(utente,comando,destinatario,parametri)
+def query (utente,destinatario,parametri) :
+  messaggio(utente,destinatario,parametri)
 
-def notice (utente,comando,destinatario,parametri) :
+def notice (utente,destinatario,parametri) :
   ircnotice ( destinatario, parametri )
 
-def join (utente,comando,destinatario,parametri) :
+def join (utente,destinatario,parametri) :
   ircjoin ( parametri )
 
-def part (utente,comando,destinatario,parametri) :
+def part (utente,destinatario,parametri) :
   if utente == owner:
     if parametri=='':
       ircpart ( destinatario )
     else:
       ircpart ( destinatario, parametri )
 
-def cuit (utente,comando,destinatario,parametri) :
+def cuit (utente,destinatario,parametri) :
 #per qualche motivo la funzione deve avere un nome diverso da quit
   if utente == owner:
     if parametri!='':
       ircquit( parametri )
     else:
       ircquit( )
+
+def e_ping ( parametri ):
+  ircsend ( 'PONG ' + parametri )
+  
+def e_join ( utente, destinatario ):
+  ircprivmsg (destinatario, 'ciao '+utente)
