@@ -11,7 +11,8 @@ import cus_lib
 cus_funct=cus_lib.cus_funct
 
 def esegui (utente,comando,destinatario,testo):
-#splitta testo
+  ambiente_attivo=cus_lib.ambiente_attivo
+  #splitta testo
   comandobot=parametri=''
   if testo.find(' ')!=-1:
     parametri=testo[testo.index(' ')+1:].strip()
@@ -34,8 +35,15 @@ def esegui (utente,comando,destinatario,testo):
 #parametri = param1 param2
 #esempio = <tizio> PRIVMSG persona :+comando param1 param2
   elif comando == 'PRIVMSG':
-    if comandobot in e_privmsg:
-      e_privmsg[comandobot](utente,destinatario,parametri)
+    if ambiente_attivo == '':
+      if comandobot in e_privmsg:
+        e_privmsg[comandobot](utente,destinatario,parametri)
+    else:
+      if comandobot in e_privmsg:
+        e_privmsg[comandobot](utente,destinatario,parametri)
+      else:
+        e_privmsg[ambiente_attivo](utente,destinatario,testo[1:])
+      
 #esempio JOIN
 #utente = tizio
 #comando = JOIN
@@ -64,14 +72,11 @@ def analisi (data): #sta cosa di sicuro si puo' fare con regex in tipo 2 righe
     except:
       pass
     stampa = datetime.datetime.fromtimestamp(time.time()).strftime('%H-%M-%S')+\
-	   '<'+utente+'> '+comando+' '+destinatario+' '+testo #finale
+	   ' <'+utente+'> '+comando+' '+destinatario+' '+testo #finale
 #    stampa = '<'+utente+'> _utente_ '+comando+' _comando_ '+destinatario+' _destinatario_ '+testo+' _testo_' #debug
     if utente!=nomebot:
       print stampa
     esegui (utente,comando,destinatario,testo)
-
-def ping (utente,destinatario,parametri) :
-  ircprivmsg ( destinatario, utente+': pong!')
 
 def ricarica (utente, destinatario, parametri) :
   if utente == owner:
@@ -86,7 +91,6 @@ adv_funct={'messaggio':messaggio,\
            'part':part,\
            'quit':cuit,\
            'notice':notice,\
-           'ping':ping,\
            'ricarica':ricarica}
 
 e_privmsg=dict(adv_funct,**cus_funct)

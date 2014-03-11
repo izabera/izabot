@@ -3,11 +3,18 @@
 from leggidati import *
 from irc_con import *
 
-r = attivo = started = 0
+import time
+import datetime
+
+ambiente_attivo = ''
+#le funzioni di ambiente assegnano il loro identificativo a ambiente_attivo
+r=0
+started=0 #non funzia
 
 def ircsend ( messaggio ): #azione base
   irc.send ( messaggio+'\r\n' )
-  print '<'+nomebot+'> '+messaggio.strip() #in questo modo si puo' stilizzare a piacere
+  print datetime.datetime.fromtimestamp(time.time()).strftime('%H-%M-%S')+\
+     ' <'+nomebot+'> '+messaggio.strip() #in questo modo si puo' stilizzare a piacere
 
 def ircnick ( nick ): #debug:da testare
   ircsend ( 'NICK '+nick )

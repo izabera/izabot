@@ -1,7 +1,7 @@
 # Legge i dati del bot da un file.
 dati = open("botdata.txt","r")
 riga = ''
-owner = nomebot = password = rete = port = comandibot = trigger = ""
+owner = nomebot = password = rete = port = trigger = ""
 while riga != '#endend':
   riga = dati.readline()
   if riga[0:len(riga)-1]=='#owner':
@@ -19,13 +19,7 @@ while riga != '#endend':
   if riga[0:len(riga)-1]=='#port':
     riga = dati.readline()
     port = int(riga[0:len(riga)-1])
-  if riga[0:len(riga)-1]=='#comandibot':
-    riga = dati.readline()
-    while riga[0:len(riga)-1]!='#end':
-      comandibot += riga[0:len(riga)-1]+' '
-      riga = dati.readline()
   if riga[0:len(riga)-1]=='#trigger':
     riga = dati.readline()
     trigger = riga[0:len(riga)-1]
 dati.close()
-comandibot=comandibot.split()
