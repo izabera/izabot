@@ -1,7 +1,7 @@
 #base functions library
 
 from leggidati import *
-from ircconnection import *
+from irc_con import *
 
 r = attivo = started = 0
 

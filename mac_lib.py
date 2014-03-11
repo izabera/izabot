@@ -8,6 +8,9 @@ def autojoin ( ) :  #join se invitato #debug:cambiare e mettere in gestione even
   ircprivmsg ( channel, 'ciao a tutti')
 
 def messaggio (utente,destinatario,parametri) :
+  ircprivmsg ( destinatario, parametri )
+
+def query (utente,destinatario,parametri) :
   try:
     parametri=parametri.strip( )
     temp=parametri.split( )
@@ -18,11 +21,16 @@ def messaggio (utente,destinatario,parametri) :
   except:
     pass
 
-def query (utente,destinatario,parametri) :
-  messaggio(utente,destinatario,parametri)
-
 def notice (utente,destinatario,parametri) :
-  ircnotice ( destinatario, parametri )
+  try:
+    parametri=parametri.strip( )
+    temp=parametri.split( )
+    mess=''
+    if len(temp)>1:
+      mess=parametri[len(temp[0])+1:]
+    ircnotice ( temp[0], mess )
+  except:
+    pass
 
 def join (utente,destinatario,parametri) :
   ircjoin ( parametri )

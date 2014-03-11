@@ -1,10 +1,10 @@
 from bas_lib import *
 
-nickserv = 0
-authserv = 1
+nickserv = 1
+authserv = 0
 altro = 0
 
-def avvio ( ) : #debug:perfetta
+def avvio ( ) :
   global started;
   if started == 0:
     ircprivmsg ( owner, 'sono connesso' )
