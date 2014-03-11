@@ -1,3 +1,4 @@
+from __future__ import division
 #custom functions library
 
 from bas_lib import *
@@ -39,6 +40,14 @@ def deliranza (utente,destinatario,parametri) :
   if parametri=='':
     ircprivmsg ( destinatario, 'balla meglio di johnny depp', 1)
 
+def calcola (utente,destinatario,parametri) :
+  if parametri!='':
+    try:
+      output=eval(parametri)
+      ircprivmsg(destinatario,parametri+'='+str(output))
+    except:
+      ircprivmsg(destinatario,'errore')
+
 #'comando':nome_funzione
 #attenzione a non creare conflitti
 #comandi e nomi funzionio vietati:
@@ -52,5 +61,6 @@ def deliranza (utente,destinatario,parametri) :
 #'ricarica':ricarica
 cus_funct={'delira':deliranza,\
            'bacio':bacio,\
-	       'g':gameon,\
-	       'game':game}
+           'g':gameon,\
+           'game':game,
+           'calcola':calcola}
