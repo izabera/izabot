@@ -47,6 +47,16 @@ def calcola (utente,destinatario,parametri) :
     except:
       ircprivmsg(destinatario,'errore')
 
+def dado (utente,destinatario,parametri) :
+  if parametri=='':
+    ircprivmsg(destinatario,str(random.randint(1,6)))
+  else:
+    try:
+      parametri = int (parametri)
+      ircprivmsg(destinatario,str(random.randint(0,parametri)))
+    except:
+      pass
+
 def wiki (utente,destinatario,parametri) :
   if parametri!='':
     try:
@@ -119,4 +129,5 @@ cus_funct={'delira':deliranza,\
            'ping':ping,\
            'calcola':calcola,\
            'game2':game2,\
-           'wiki':wiki}
+           'wiki':wiki,\
+           'dado':dado}
