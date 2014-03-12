@@ -24,7 +24,7 @@ Python 2.7.5
 
 comandi
 -
-###standard:### +messaggio +query +notice +join +part +quit
-###utili:### +calcola +wiki +dado +ping
-###giochi:### +game +eqgame +wikigame
+- **standard:** +messaggio +query +notice +join +part +quit
+- **utili:** +calcola +wiki +dado +ping
+- **giochi:** +game +eqgame +wikigame
 il trigger `+` è configurabile in `botdata.txt`
