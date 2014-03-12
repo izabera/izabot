@@ -51,10 +51,10 @@ def game2 (utente,destinatario,parametri) :
   global r
   a=['+','-','*','//']
   if parametri == 'on' and ambiente_attivo == '':
-    ircprivmsg ( destinatario, 'io dico un\'espressione e voi dite il risultato preceduto da +c')
+    ircprivmsg ( destinatario, 'io dico un\'espressione e voi dite il risultato')
     ircprivmsg ( destinatario, 'le divisioni sono divisioni intere')
     ircprivmsg ( destinatario, 'esempio: 5+3*2+3/5')
-    ircprivmsg ( destinatario, 'risposta: +c 11')
+    ircprivmsg ( destinatario, 'risposta: 11')
     ircprivmsg ( destinatario, ' ')
     while 1:
       r=str(random.randint(0,10))
@@ -87,7 +87,6 @@ def game2 (utente,destinatario,parametri) :
 #'part':part
 #'quit':cuit
 #'notice':notice
-#'ping':ping
 #'ricarica':ricarica
 cus_funct={'delira':deliranza,\
            'bacio':bacio,\

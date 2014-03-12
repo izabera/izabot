@@ -50,7 +50,7 @@ def esegui (utente,comando,destinatario,testo):
 #destinatario = #chan
   elif comando == 'JOIN':
     if utente != nomebot:
-	  e_join(utente,destinatario[1:])#destinatario inizia con ':'
+	  e_join(utente,destinatario)#destinatario inizia con ':'
 
 def analisi (data): #sta cosa di sicuro si puo' fare con regex in tipo 2 righe
   riga=data.split("\n")
