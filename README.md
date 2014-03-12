@@ -17,3 +17,7 @@ bug e limitazioni
 al momento le funzioni definite dall'utente possono applicarsi solo agli eventi PRIVMSG
 
 l'autenticazione non funziona ancora bene
+
+testato con
+-
+Python 2.7.5
