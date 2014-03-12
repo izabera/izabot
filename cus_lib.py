@@ -1,5 +1,6 @@
 from __future__ import division
 from math import *
+import urllib2
 #custom functions library
 
 from bas_lib import *
@@ -45,6 +46,22 @@ def calcola (utente,destinatario,parametri) :
       ircprivmsg(destinatario,parametri+'='+str(output))
     except:
       ircprivmsg(destinatario,'errore')
+
+def wiki (utente,destinatario,parametri) :
+  if parametri!='':
+    try:
+      indirizzo='https://it.wikipedia.org/w/api.php?action=query&prop=extracts&exsentences=2&explaintext&format=xml&titles='
+      parametri=parametri.replace(' ','%20')
+      invio=urllib2.urlopen(indirizzo+parametri).read()
+      if invio.find('" missing="" />')!=-1:
+        ircprivmsg(destinatario,'pagina non trovata')
+      else:
+        invio=invio[invio.find('ve">')+4:]
+        invio=invio.replace('&quot;','"')
+        invio=invio.replace('</extract></page></pages></query></api>','')
+        ircprivmsg(destinatario,invio)
+    except Exception as exception:
+      ircprivmsg(destinatario,exception.__class__.__name__)
 
 def game2 (utente,destinatario,parametri) :
   global ambiente_attivo
@@ -93,4 +110,5 @@ cus_funct={'delira':deliranza,\
            'game':game,
            'ping':ping,\
            'calcola':calcola,\
-           'game2':game2}
+           'game2':game2,\
+           'wiki':getwiki}
