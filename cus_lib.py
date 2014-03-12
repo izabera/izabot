@@ -57,8 +57,9 @@ def wiki (utente,destinatario,parametri) :
         ircprivmsg(destinatario,'pagina non trovata')
       else:
         invio=invio[invio.find('ve">')+4:]
-        invio=invio.replace('&quot;','"')
         invio=invio.replace('</extract></page></pages></query></api>','')
+        invio=invio.replace('&quot;','"')
+        invio=invio.replace('\n',' ')
         ircprivmsg(destinatario,invio)
     except Exception as exception:
       ircprivmsg(destinatario,exception.__class__.__name__)
@@ -111,4 +112,4 @@ cus_funct={'delira':deliranza,\
            'ping':ping,\
            'calcola':calcola,\
            'game2':game2,\
-           'wiki':getwiki}
+           'wiki':wiki}
