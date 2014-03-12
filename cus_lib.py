@@ -60,7 +60,14 @@ def wiki (utente,destinatario,parametri) :
         invio=invio.replace('</extract></page></pages></query></api>','')
         invio=invio.replace('&quot;','"')
         invio=invio.replace('\n',' ')
-        ircprivmsg(destinatario,invio)
+        taglia = tagliaold = 0
+        while taglia != -1:
+          if taglia != tagliaold:
+            ircprivmsg(destinatario,invio[tagliaold:taglia].strip())
+          tagliaold=taglia
+          taglia = invio.find(' ',100+tagliaold)
+        if len(invio[tagliaold:].strip())!=0:
+          ircprivmsg(destinatario,invio[tagliaold:].strip())
     except Exception as exception:
       ircprivmsg(destinatario,exception.__class__.__name__)
 
