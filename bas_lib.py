@@ -9,7 +9,8 @@ import datetime
 ambiente_attivo = ''
 #le funzioni di ambiente assegnano il loro identificativo a ambiente_attivo
 r=0
-started=0 #non funzia
+started=0
+secondi=int(time.time())
 
 def ircsend ( messaggio ): #azione base
   irc.send ( messaggio+'\r\n' )

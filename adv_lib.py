@@ -9,6 +9,7 @@ import datetime
 
 import cus_lib
 cus_funct=cus_lib.cus_funct
+#tim_funct=cus_lib.tim_funct #funzioni a tempo
 
 def esegui (utente,comando,destinatario,testo):
   ambiente_attivo=cus_lib.ambiente_attivo
@@ -83,6 +84,8 @@ def ricarica (utente, destinatario, parametri) :
     reload(cus_lib)
     cus_funct=cus_lib.cus_funct
     e_privmsg.update(cus_funct)
+    #tim_funct=cus_lib.tim_funct
+    #e_tempo.update(tim_funct)
     print 'funzioni ricaricate'
 
 adv_funct={'messaggio':messaggio,\
@@ -94,3 +97,4 @@ adv_funct={'messaggio':messaggio,\
            'ricarica':ricarica}
 
 e_privmsg=dict(adv_funct,**cus_funct)
+#e_tempo=tim_funct

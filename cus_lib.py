@@ -1,6 +1,7 @@
 from __future__ import division
 from math import *
 import urllib2
+import xml.dom.minidom as xml
 #custom functions library
 
 from bas_lib import *
@@ -31,57 +32,8 @@ def game (utente,destinatario,parametri) :
         ircprivmsg ( destinatario, 'troppo grosso!')
     except:
       print 'problema'
-    
-def bacio (utente,destinatario,parametri) :
-  ircprivmsg ( destinatario, utente+' manda un dolce bacio :* a '+parametri)
 
-def deliranza (utente,destinatario,parametri) :
-  if parametri=='':
-    ircprivmsg ( destinatario, 'balla molto meglio di johnny depp', 1)
-
-def calcola (utente,destinatario,parametri) :
-  if parametri!='':
-    try:
-      output=eval(parametri)
-      ircprivmsg(destinatario,parametri+'='+str(output))
-    except:
-      ircprivmsg(destinatario,'errore')
-
-def dado (utente,destinatario,parametri) :
-  if parametri=='':
-    ircprivmsg(destinatario,str(random.randint(1,6)))
-  else:
-    try:
-      parametri = int (parametri)
-      ircprivmsg(destinatario,str(random.randint(0,parametri)))
-    except:
-      pass
-
-def wiki (utente,destinatario,parametri) :
-  if parametri!='':
-    try:
-      indirizzo='https://it.wikipedia.org/w/api.php?action=query&prop=extracts&exsentences=2&explaintext&format=xml&titles='
-      parametri=parametri.replace(' ','%20')
-      invio=urllib2.urlopen(indirizzo+parametri).read()
-      if invio.find('" missing="" />')!=-1:
-        ircprivmsg(destinatario,'pagina non trovata')
-      else:
-        invio=invio[invio.find('ve">')+4:]
-        invio=invio.replace('</extract></page></pages></query></api>','')
-        invio=invio.replace('&quot;','"')
-        invio=invio.replace('\n',' ')
-        taglia = tagliaold = 0
-        while taglia != -1:
-          if taglia != tagliaold:
-            ircprivmsg(destinatario,invio[tagliaold:taglia].strip())
-          tagliaold=taglia
-          taglia = invio.find(' ',100+tagliaold)
-        if len(invio[tagliaold:].strip())!=0:
-          ircprivmsg(destinatario,invio[tagliaold:].strip())
-    except Exception as exception:
-      ircprivmsg(destinatario,exception.__class__.__name__)
-
-def game2 (utente,destinatario,parametri) :
+def eqgame (utente,destinatario,parametri) :
   global ambiente_attivo
   global r
   a=['+','-','*','//']
@@ -102,16 +54,122 @@ def game2 (utente,destinatario,parametri) :
       except:
           pass
     ircprivmsg ( destinatario, 'espressione: ----------->  '+r.replace('//','/') )
-    ambiente_attivo = 'game2'
+    ambiente_attivo = 'eqgame'
   elif parametri == 'off':
     ambiente_attivo = ''
-  elif ambiente_attivo == 'game2':
+  elif ambiente_attivo == 'eqgame':
     try:
       if eval(r)==int(parametri) :
         ircprivmsg ( destinatario, 'congratulazioni '+utente+'! hai indovinato!')
         ambiente_attivo = ''
     except:
       pass
+
+def asterisco (testo):
+  aster=''
+  for i in range(len(testo)):
+    if testo[i]!=' ':
+      aster+='*'
+    else :
+      aster+=' '
+  return aster
+
+def nascondi (stringa, testo): #nascondi('Ciao Barba blu Gatto','barba Blu')='Ciao ***** *** Gatto
+  aster=asterisco(testo)
+  stringalow=stringa.lower().replace(testo.lower(),aster)
+  finale = ''
+  for i in range(len(stringa)):
+    if stringa[i].lower() == stringalow[i].lower():
+      finale+=stringa[i]
+    else:
+      finale+=stringalow[i]
+  return finale
+
+temp=0
+def wikigame (utente,destinatario,parametri) :
+  global ambiente_attivo
+  global r
+  global temp
+  if parametri == 'on' and ambiente_attivo == '':
+    ircprivmsg(destinatario,'\0038,4indovinate di che pagina di wikipedia si tratta')
+    r=wikibackend('random','','action=query&list=random&rnnamespace=0&format=xml')#schifezza
+    stampa=wikibackend('testo',r)
+    stampa=nascondi(stampa,r)
+    formatta(destinatario, stampa)
+    ambiente_attivo = 'wikigame'
+    temp=0
+  elif parametri == 'hint' and ambiente_attivo == 'wikigame':
+    temp+=3
+    ircprivmsg(destinatario,'\0038,4indizio: '+r[0:temp]+asterisco(r[temp:]))
+  elif parametri == 'off':
+    ambiente_attivo = ''
+  elif ambiente_attivo == 'wikigame':
+    try:
+      if r.strip().lower()==parametri.strip().lower() : #probabilmente non serve strippare
+        ircprivmsg ( destinatario, 'congratulazioni '+utente+'! hai indovinato!')
+        ambiente_attivo = ''
+    except:
+      pass
+
+def bacio (utente,destinatario,parametri) :
+  ircprivmsg ( destinatario, utente+' manda un dolce bacio :* a '+parametri)
+
+def deliranza (utente,destinatario,parametri) :
+  if parametri=='':
+    ircprivmsg ( destinatario, 'balla molto meglio di johnny depp', 1)
+
+def calcola (utente,destinatario,parametri) :
+  if parametri!='':
+    try:
+      output=eval(parametri)
+      if output == int(output):
+        output= int(output)
+      ircprivmsg(destinatario,parametri+'='+str(output))
+    except:
+      ircnotice(destinatario,'errore')
+
+def dado (utente,destinatario,parametri) :
+  if parametri=='':
+    ircprivmsg(destinatario,str(random.randint(1,6)))
+  else:
+    try:
+      parametri = int (parametri)
+      ircprivmsg(destinatario,str(random.randint(0,parametri)))
+    except:
+      pass
+
+def formatta (destinatario,invio):
+    taglia = tagliaold = 0
+    while taglia != -1:
+      if taglia != tagliaold:
+        ircprivmsg(destinatario,invio[tagliaold:taglia].strip())
+      tagliaold=taglia
+      taglia = invio.find(' ',100+tagliaold)
+    if len(invio[tagliaold:].strip())!=0:
+      ircprivmsg(destinatario,invio[tagliaold:].strip())
+
+def wiki (utente,destinatario,parametri) :
+  if parametri!='':
+    invio=wikibackend('testo',parametri)
+    formatta(destinatario,invio)
+
+def wikibackend (tipo,parametri,indirizzo='action=query&prop=extracts&exsentences=2&explaintext&format=xml&titles='): #tipo e' 'random' o 'testo'
+  try:
+    indirizzo='https://it.wikipedia.org/w/api.php?'+indirizzo
+    parametri=parametri.replace(' ','%20')
+    invio=urllib2.urlopen(indirizzo+parametri).read()
+    if invio.find('" missing="" />')!=-1:
+      return 'pagina non trovata'
+    else:
+      invio=invio.replace('&quot;','"')
+      invio=invio.replace('\n',' ')
+      risu=xml.parseString(invio)
+      if tipo == 'random':
+        return risu.getElementsByTagName('page')[0].attributes['title'].value.encode('utf-8').strip()
+      else :
+        return risu.getElementsByTagName('extract')[0].firstChild.nodeValue.encode('utf-8').strip()
+  except Exception as exception:
+    return exception.__class__.__name__
 
 #'comando':nome_funzione
 #attenzione a non creare conflitti
@@ -128,6 +186,7 @@ cus_funct={'delira':deliranza,\
            'game':game,
            'ping':ping,\
            'calcola':calcola,\
-           'game2':game2,\
+           'eqgame':eqgame,\
            'wiki':wiki,\
-           'dado':dado}
+           'dado':dado,
+           'wikigame':wikigame}
