@@ -5,7 +5,7 @@ izabot
 #password
 xxxx
 #rete
-irc.mibbit.net
+irc.onlinegamesnet.net
 #port
 6667
 #trigger
